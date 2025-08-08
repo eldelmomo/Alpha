@@ -1,6 +1,4 @@
-import java.util.List;
 import java.util.Set;
-
 import util.Pair;
 
 
@@ -25,22 +23,16 @@ public class Main {
 			String[][] traces = Args2Traces(args);
 			String[][] footprint = AlphaMiner.mineFootprint(traces);
 
-			System.out.println("Footprint:");
+			System.out.println("\nFootprint Matrix:");
 			for (String[] trace : footprint) {
 				System.out.println(String.join(", ", trace));
 			}
 
-			//List<Pair<Set<String>, Set<String>>> places = AlphaMiner.footprint2Places(footprint);
-			//System.out.println("Places:");
-			//for (Pair<Set<String>, Set<String>> place : places) {
-			//	System.out.println("Preset: " + place.first + " -> Postset: " + place.second);
-			//}
-
-			//Set<Pair<Set<String>,Set<String>>> places = AlphaMiner.minePetriNet(traces);
-			//System.out.println("Places:");
-			//for (Pair<Set<String>, Set<String>> place : places) {
-			//	System.out.println("Preset: " + place.first + " -> Postset: " + place.second);
-			//}
+			Set<Pair<Set<String>,Set<String>>> places = AlphaMiner.minePetriNet(traces);
+			System.out.println("\nPetriNet (Places List):");
+			for (Pair<Set<String>, Set<String>> place : places) {
+				System.out.println(place.first + " -> " + place.second);
+			}
 			
 		}
     }
