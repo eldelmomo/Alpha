@@ -1,0 +1,62 @@
+# Archivos y carpetas comunes para proyectos Java
+
+# Compilados de Java
+*.class
+
+# Archivos de log
+*.log
+
+# Archivos generados por IDEs
+/.idea/
+/*.iml
+*.ipr
+*.iws
+*.swp
+
+# Eclipse
+/.settings/
+/bin/
+/build/
+/target/
+/.metadata/
+/*.classpath
+/*.project
+
+# VS Code
+.vscode/
+
+# Maven
+/target/
+/pom.xml.tag
+/pom.xml.releaseBackup
+/pom.xml.versionsBackup
+/pom.xml.next
+/release.properties
+
+# Gradle
+/.gradle/
+/build/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de pruebas
+/test-output/
+/out/
+
+# Archivos temporales
+*.tmp
+*.bak
+*.old
+
+# Archivos de cobertura
+/coverage/
+
+# Jupyter Notebooks
+*.ipynb_checkpoints
+
+# Otros
+*.jar
+*.war
+*.ear
