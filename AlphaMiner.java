@@ -84,6 +84,34 @@ public class AlphaMiner {
         Set<Pair<String, String>> causalPost = new HashSet<>(causal);
         Set<Pair<String, String>> causalPre = new HashSet<>(causal);
 
+         Set<String> tasksEmpty = new HashSet<>();
+
+        for (Pair<String, String> p : causal) {
+            if (!tasksEmpty.contains(p.first)) {
+                tasksEmpty.add(p.first);
+            }
+            if (!tasksEmpty.contains(p.second)) {
+                tasksEmpty.add(p.second);
+            }
+            causalPost.add(new Pair<>(p.first, p.second));
+            causalPre.add(new Pair<>(p.first, p.second));
+        }
+
+        // To control shortloops and autoloops
+        for (String t : tasks) {
+            if (!tasksEmpty.contains(t)) {
+                for (Pair<String, String> p : parallels) {
+                    if (p.first.equals(t)){
+                        causalPost.add(new Pair<>(t, p.second));
+                        causalPre.add(new Pair<>(p.second, t));
+                    } else if (p.second.equals(t)) {
+                        causalPost.add(new Pair<>(p.first, t));
+                        causalPre.add(new Pair<>(t, p.first));
+                    }
+                }
+            }
+        }
+
         // Add initials and finals as places
         places.add(new Pair<>(new HashSet<>(Set.of("")), initials));
         places.add(new Pair<>(finals, new HashSet<>(Set.of(""))));
@@ -97,6 +125,17 @@ public class AlphaMiner {
                     post.add(b);
                 }
             }
+            // Find all b such that b -> a : Preset
+            List<String> pre = new ArrayList<>();
+            for (String b : tasks) {
+                if (causalPre.contains(new Pair<>(b, a))) {
+                    pre.add(b);
+                }
+            }
+
+        
+
+
             if (post.size() == 1) { // a -> b
                 String b = post.get(0);
                 places.add(new Pair<>(new HashSet<>(Set.of(a)), new HashSet<>(Set.of(b))));
@@ -112,24 +151,18 @@ public class AlphaMiner {
                         } else {
                             // a -> b , a -> c , b # c
                             // a -> b , a -> c , b -> c
-                            places.add(new Pair<>(new HashSet<>(Set.of(a)),
-                                    new HashSet<>(Set.of(post.get(i), post.get(j)))));
-
+                            if (parallels.contains(new Pair<>(post.get(i), post.get(i)))) { // control autoloop i
+                                places.add(new Pair<>(new HashSet<>(Set.of(a,post.get(i))), new HashSet<>(Set.of(post.get(i), post.get(j)))));
+                            } else if (parallels.contains(new Pair<>(post.get(j), post.get(j)))) { // control autoloop j
+                                places.add(new Pair<>(new HashSet<>(Set.of(a,post.get(j))), new HashSet<>(Set.of(post.get(i), post.get(j)))));
+                            } else {
+                                places.add(new Pair<>(new HashSet<>(Set.of(a)),new HashSet<>(Set.of(post.get(i), post.get(j)))));
+                            }
                         }
                     }
                 }
             }
-            for (String b : post) {
-                causalPost.remove(new Pair<>(a, b)); // Remove processed pairs
-            }
 
-            // Find all b such that b -> a : Preset
-            List<String> pre = new ArrayList<>();
-            for (String b : tasks) {
-                if (causalPre.contains(new Pair<>(b, a))) {
-                    pre.add(b);
-                }
-            }
             if (!pre.isEmpty()) {
                 for (int i = 0; i < pre.size(); i++) {
                     for (int j = 0; j < pre.size(); j++) {
@@ -142,11 +175,21 @@ public class AlphaMiner {
                         } else {
                             // a -> c , b -> c , a # b
                             // a -> c , b -> c , a -> b
-                            places.add(new Pair<>(new HashSet<>(Set.of(pre.get(i), pre.get(j))),
-                                    new HashSet<>(Set.of(a))));
+                            if (parallels.contains(new Pair<>(pre.get(i), pre.get(i)))) { // control autoloop i
+                                places.add(new Pair<>(new HashSet<>(Set.of(pre.get(i), pre.get(j))), new HashSet<>(Set.of(a,pre.get(i)))));
+                            } else if (parallels.contains(new Pair<>(pre.get(j), pre.get(j)))) { // control autoloop j
+                                places.add(new Pair<>(new HashSet<>(Set.of(pre.get(i), pre.get(j))), new HashSet<>(Set.of(a,pre.get(j)))));
+                            } else {
+                                places.add(new Pair<>(new HashSet<>(Set.of(pre.get(i), pre.get(j))), new HashSet<>(Set.of(a))));
+                            }
                         }
                     }
                 }
+            }
+
+            // Remove processed pairs
+            for (String b : post) {
+                causalPost.remove(new Pair<>(a, b));
             }
             for (String b : pre) {
                 causalPre.remove(new Pair<>(b, a));
